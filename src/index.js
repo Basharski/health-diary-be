@@ -1,31 +1,24 @@
+// src/index.js
 import express from 'express';
+// PÄIVITETTY RIVI: Tuodaan nyt kaikki kolme funktiota
+import { getItems, getItemById, postItem, deleteItem } from './items.js'; 
+import { getUserById, postUser, loginUser } from './users.js';
 
 const app = express();
 const hostname = '127.0.0.1';
 const port = 3000;
 
-// Middleware to read JSON data from the request body
 app.use(express.json());
 
-// 1. READ DATA (GET) - Sends a response in JSON format
-app.get('/api/items', (req, res) => {
-  const dummyData = [
-    { id: 1, name: 'Apple' },
-    { id: 2, name: 'Banana' }
-  ];
-  // 200 OK is sent automatically with res.json()
-  res.json(dummyData); 
-});
+// 1. READ ALL DATA (GET)
+app.get('/api/items', getItems);
 
-// 2. SEND DATA (POST) - Receives data and creates something new
-app.post('/api/items', (req, res) => {
-  const receivedData = req.body;
-  // 201 Created is the correct status code for creating a resource
-  res.status(201).json({
-    message: 'Item created successfully!',
-    yourData: receivedData
-  });
-});
+// 1.5. READ ONE SPECIFIC DATA (GET by ID) - Tämä puuttui aiemmin!
+app.get('/api/items/:id', getItemById);
+
+// 2. SEND DATA (POST) - Korvattiin vanha koodi tällä lyhyellä versiolla!
+app.post('/api/items', postItem);
+
 
 // 3. MODIFY DATA (PUT) - Dummy functionality to update an item
 app.put('/api/items/:id', (req, res) => {
@@ -44,18 +37,19 @@ app.put('/api/items/:id', (req, res) => {
   });
 });
 
-// 4. DELETE DATA (DELETE) - Dummy functionality to delete an item
-app.delete('/api/items/:id', (req, res) => {
-  const itemId = req.params.id;
+// 4. DELETE DATA
+app.delete('/api/items/:id', deleteItem);
 
-  // Dummy error testing: if ID is 999, fail to delete
-  if (itemId === '999') {
-    return res.status(404).json({ error: 'Item not found to delete.' });
-  }
+// --- USERS ROUTES ---
 
-  // 200 OK for successful deletion (or 204 No Content if sending no body)
-  res.status(200).json({ message: `Item ${itemId} deleted successfully!` });
-});
+// Hae käyttäjä ID:llä
+app.get('/api/users/:id', getUserById);
+
+// Luo uusi käyttäjä
+app.post('/api/users', postUser);
+
+// Kirjaudu sisään (Huom: Kirjautuminen on yleensä POST, koska lähetämme salasanoja piilossa)
+app.post('/api/users/login', loginUser);
 
 // 5. 404 RESPONSE - Catch-all for non-existing resources
 app.use((req, res) => {
