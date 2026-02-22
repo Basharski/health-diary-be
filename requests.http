@@ -41,6 +41,9 @@ DELETE http://127.0.0.1:3000/api/items/2
 ### USERS (KÄYTTÄJÄT)
 ### ==========================================
 
+### 0. Hae kaikki käyttäjät (GET)
+GET http://127.0.0.1:3000/api/users
+
 ### 1. Hae käyttäjä ID:llä 1 (Johndoe)
 GET http://127.0.0.1:3000/api/users/1
 
@@ -53,6 +56,9 @@ Content-Type: application/json
   "password": "mario123",
   "email": "mario@nintendo.com"
 }
+
+### 2.5 Poista käyttäjä ID:llä (DELETE)
+DELETE http://127.0.0.1:3000/api/users/2
 
 ### 3. Testaa ONNISTUNUTTA kirjautumista (Johndoe)
 POST http://127.0.0.1:3000/api/users/login

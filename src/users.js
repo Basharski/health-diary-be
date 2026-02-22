@@ -7,13 +7,24 @@ const users = [
   { id: 3, username: "bobsmith", password: "password3", email: "bobsmith@example.com" }
 ];
 
+const toPublicUser = (user) => {
+  if (!user) return user;
+  const { password, ...publicUser } = user;
+  return publicUser;
+};
+
+// 0. Hae kaikki käyttäjät (GET)
+const getUsers = (req, res) => {
+  res.json(users.map(toPublicUser));
+};
+
 // 1. Hae tietty käyttäjä ID:llä (GET)
 const getUserById = (req, res) => {
   const id = req.params.id;
   const user = users.find(u => u.id == id);
 
   if (user) {
-    res.json(user);
+    res.json(toPublicUser(user));
   } else {
     res.status(404).json({ error: 'User not found' });
   }
@@ -22,6 +33,15 @@ const getUserById = (req, res) => {
 // 2. Luo uusi käyttäjä (POST)
 const postUser = (req, res) => {
   const newUser = req.body;
+
+  if (!newUser || typeof newUser !== 'object') {
+    return res.status(400).json({ error: 'Missing request body' });
+  }
+
+  const { username, password, email } = newUser;
+  if (!username || !password || !email) {
+    return res.status(400).json({ error: 'username, password and email are required' });
+  }
   
   // Generoidaan uusi ID
   newUser.id = users.length > 0 ? users[users.length - 1].id + 1 : 1;
@@ -29,14 +49,38 @@ const postUser = (req, res) => {
   
   res.status(201).json({
     message: 'User created successfully!',
-    user: newUser
+    user: toPublicUser(newUser)
+  });
+};
+
+// 2.5 Poista käyttäjä (DELETE)
+const deleteUser = (req, res) => {
+  const id = req.params.id;
+  const index = users.findIndex(u => u.id == id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'User not found to delete.' });
+  }
+
+  const deletedUser = users.splice(index, 1);
+  res.json({
+    message: `User ${id} deleted successfully!`,
+    deleted: toPublicUser(deletedUser[0])
   });
 };
 
 // 3. Dummy-kirjautuminen (POST)
 const loginUser = (req, res) => {
+  if (!req.body || typeof req.body !== 'object') {
+    return res.status(400).json({ error: 'Missing request body' });
+  }
+
   // Puretaan (destructuring) req.body:stä username ja password
   const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'username and password are required' });
+  }
   
   // Etsitään käyttäjä, jolla on täsmälleen sama tunnus JA salasana
   const user = users.find(u => u.username === username && u.password === password);
@@ -54,4 +98,4 @@ const loginUser = (req, res) => {
 };
 
 // Viedään funktiot, jotta index.js voi käyttää niitä
-export { getUserById, postUser, loginUser };
+export { getUsers, getUserById, postUser, deleteUser, loginUser };

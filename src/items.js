@@ -27,6 +27,14 @@ const getItemById = (req, res) => {
 // 3. UUSI: Lisää uuden itemin taulukkoon
 const postItem = (req, res) => {
   const newItem = req.body; // Napataan käyttäjän lähettämä data (esim. { "name": "Orange" })
+
+  if (!newItem || typeof newItem !== 'object') {
+    return res.status(400).json({ error: 'Missing request body' });
+  }
+
+  if (!newItem.name) {
+    return res.status(400).json({ error: 'name is required' });
+  }
   
   // Generoidaan uudelle itemille ID (katsotaan mikä on listan viimeinen ID ja lisätään 1)
   newItem.id = items.length > 0 ? items[items.length - 1].id + 1 : 1;
@@ -62,4 +70,33 @@ const deleteItem = (req, res) => {
   }
 };
 
-export { getItems, getItemById, postItem, deleteItem };
+// 5. UUSI: Päivittää itemin (PUT)
+const putItem = (req, res) => {
+  const id = req.params.id;
+  const updatedData = req.body;
+
+  if (!updatedData || typeof updatedData !== 'object') {
+    return res.status(400).json({ error: 'Missing request body' });
+  }
+
+  const index = items.findIndex(item => item.id == id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Item not found to update.' });
+  }
+
+  const updatedItem = {
+    ...items[index],
+    ...updatedData,
+    id: items[index].id
+  };
+
+  items[index] = updatedItem;
+
+  res.status(200).json({
+    message: `Item ${id} updated successfully!`,
+    item: updatedItem
+  });
+};
+
+export { getItems, getItemById, postItem, putItem, deleteItem };

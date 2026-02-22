@@ -1,13 +1,14 @@
 // src/index.js
 import express from 'express';
-// PÄIVITETTY RIVI: Tuodaan nyt kaikki kolme funktiota
-import { getItems, getItemById, postItem, deleteItem } from './items.js'; 
-import { getUserById, postUser, loginUser } from './users.js';
+import cors from 'cors';
+import { getItems, getItemById, postItem, putItem, deleteItem } from './items.js';
+import { getUsers, getUserById, postUser, deleteUser, loginUser } from './users.js';
 
 const app = express();
 const hostname = '127.0.0.1';
 const port = 3000;
 
+app.use(cors());
 app.use(express.json());
 
 // 1. READ ALL DATA (GET)
@@ -19,34 +20,25 @@ app.get('/api/items/:id', getItemById);
 // 2. SEND DATA (POST) - Korvattiin vanha koodi tällä lyhyellä versiolla!
 app.post('/api/items', postItem);
 
-
-// 3. MODIFY DATA (PUT) - Dummy functionality to update an item
-app.put('/api/items/:id', (req, res) => {
-  const itemId = req.params.id;
-  const updatedData = req.body;
-  
-  // Dummy error testing: if someone tries to update ID 999, send an error
-  if (itemId === '999') {
-    return res.status(400).json({ error: 'Cannot update this specific item.' });
-  }
-
-  // 200 OK for successful update
-  res.status(200).json({
-    message: `Item ${itemId} updated successfully!`,
-    newData: updatedData
-  });
-});
+// 3. MODIFY DATA (PUT)
+app.put('/api/items/:id', putItem);
 
 // 4. DELETE DATA
 app.delete('/api/items/:id', deleteItem);
 
 // --- USERS ROUTES ---
 
+// Hae kaikki käyttäjät
+app.get('/api/users', getUsers);
+
 // Hae käyttäjä ID:llä
 app.get('/api/users/:id', getUserById);
 
 // Luo uusi käyttäjä
 app.post('/api/users', postUser);
+
+// Poista käyttäjä ID:llä
+app.delete('/api/users/:id', deleteUser);
 
 // Kirjaudu sisään (Huom: Kirjautuminen on yleensä POST, koska lähetämme salasanoja piilossa)
 app.post('/api/users/login', loginUser);
