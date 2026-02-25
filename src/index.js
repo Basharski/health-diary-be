@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { getItems, getItemById, postItem, putItem, deleteItem } from './items.js';
 import { getUsers, getUserById, postUser, deleteUser, loginUser } from './users.js';
+import { getEntries, getEntryById, postEntry, deleteEntry } from './entries.js';
 
 const app = express();
 const hostname = '127.0.0.1';
@@ -25,6 +26,12 @@ app.put('/api/items/:id', putItem);
 
 // 4. DELETE DATA
 app.delete('/api/items/:id', deleteItem);
+
+// --- ENTRIES ROUTES ---
+app.get('/api/entries', getEntries);
+app.get('/api/entries/:id', getEntryById);
+app.post('/api/entries', postEntry);
+app.delete('/api/entries/:id', deleteEntry);
 
 // --- USERS ROUTES ---
 
