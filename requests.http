@@ -77,3 +77,71 @@ Content-Type: application/json
   "username": "johndoe",
   "password": "wrongpassword!"
 }
+
+
+### ==========================================
+### AUTH (JWT)
+### ==========================================
+
+### Login (returns token)
+POST http://127.0.0.1:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "johndoe",
+  "password": "password1"
+}
+
+### Get my user info (paste token from login)
+GET http://127.0.0.1:3000/api/auth/me
+Authorization: Bearer {{token}}
+
+
+### ==========================================
+### ENTRIES (Protected)
+### ==========================================
+
+### Get my entries
+GET http://127.0.0.1:3000/api/entries
+Authorization: Bearer {{token}}
+
+### Create entry for logged-in user
+POST http://127.0.0.1:3000/api/entries
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "entry_date": "2026-02-22",
+  "mood": "Good",
+  "weight": 72.5,
+  "sleep_hours": 7,
+  "notes": "JWT protected entry"
+}
+
+### Update entry (only owner)
+PUT http://127.0.0.1:3000/api/entries/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "mood": "Great",
+  "notes": "Updated with token"
+}
+
+### Delete entry (only owner)
+DELETE http://127.0.0.1:3000/api/entries/1
+Authorization: Bearer {{token}}
+
+
+### ==========================================
+### USERS (Protected update)
+### ==========================================
+
+### Update my own user (id must match token userId)
+PUT http://127.0.0.1:3000/api/users/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "johndoe+updated@example.com"
+}
